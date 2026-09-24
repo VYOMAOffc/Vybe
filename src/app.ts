@@ -38,39 +38,52 @@ export class App {
   private initializeSwaggerUI() {
     this.app.doc31('/swagger', (c) => {
       const { protocol: urlProtocol, hostname, port } = new URL(c.req.url)
-      const protocol = c.req.header('x-forwarded-proto') ? `${c.req.header('x-forwarded-proto')}:` : urlProtocol
+
+      const protocol = c.req.header('x-forwarded-proto')
+        ? `${c.req.header('x-forwarded-proto')}:`
+        : urlProtocol
 
       return {
         openapi: '3.1.0',
 
         info: {
           version: '1.0.0',
-          title: 'JioSaavn API',
-          description: `# Introduction 
-        \nJioSaavn API, accessible at [saavn.dev](https://saavn.dev), is an unofficial API that allows users to download high-quality songs from [JioSaavn](https://jiosaavn.com). 
-        It offers a fast, reliable, and easy-to-use API for developers. \n`
+          title: 'VYBE API',
+          description: `# Introduction
+
+VYBE API is a fast, reliable, and easy-to-use music API for developers.
+
+Connect with us on [Telegram](https://t.me/VyomaOfficial).`
         },
-        servers: [{ url: `${protocol}//${hostname}${port ? `:${port}` : ''}`, description: 'Current environment' }]
+
+        servers: [
+          {
+            url: `${protocol}//${hostname}${port ? `:${port}` : ''}`,
+            description: 'Current environment'
+          }
+        ]
       }
     })
 
     this.app.get(
       '/docs',
       apiReference({
-        pageTitle: 'JioSaavn API Documentation',
+        pageTitle: 'VYBE API Documentation',
         theme: 'deepSpace',
         isEditable: false,
         layout: 'modern',
         darkMode: true,
+
         metaData: {
-          applicationName: 'JioSaavn API',
-          author: 'Sumit Kolhe',
-          creator: 'Sumit Kolhe',
-          publisher: 'Sumit Kolhe',
+          applicationName: 'VYBE API',
+          author: 'VYOMA',
+          creator: 'VYOMA',
+          publisher: 'VYOMA',
           robots: 'index, follow',
           description:
-            'JioSaavn API is an unofficial wrapper written in TypeScript for jiosaavn.com providing programmatic access to a vast library of songs, albums, artists, playlists, and more.'
+            'VYBE API is a fast and reliable music API for developers, providing programmatic access to songs, albums, artists, and playlists.'
         },
+
         url: '/swagger'
       })
     )
@@ -78,14 +91,27 @@ export class App {
 
   private initializeRouteFallback() {
     this.app.notFound((ctx) => {
-      return ctx.json({ success: false, message: 'route not found, check docs at https://saavn.dev/docs' }, 404)
+      return ctx.json(
+        {
+          success: false,
+          message: 'Route not found. Check the API documentation at /docs'
+        },
+        404
+      )
     })
   }
 
   private initializeErrorHandler() {
     this.app.onError((err, ctx) => {
       const error = err as HTTPException
-      return ctx.json({ success: false, message: error.message }, error.status || 500)
+
+      return ctx.json(
+        {
+          success: false,
+          message: error.message
+        },
+        error.status || 500
+      )
     })
   }
 

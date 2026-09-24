@@ -1,18 +1,11 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
-import { Scalar } from '@scalar/hono-api-reference'
+import { apiReference } from '@scalar/hono-api-reference'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 import { Home } from './pages/home'
 import type { Routes } from '#common/types'
 import type { HTTPException } from 'hono/http-exception'
-
-const ERROR_CODE_MAP: Record<number, string> = {
-  400: 'BAD_REQUEST',
-  404: 'NOT_FOUND',
-  429: 'TOO_MANY_REQUESTS',
-  500: 'INTERNAL_SERVER_ERROR'
-}
 
 export class App {
   private app: OpenAPIHono
@@ -29,6 +22,7 @@ export class App {
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach((route) => {
+      route.initRoutes()
       this.app.route('/api', route.controller)
     })
 
@@ -62,12 +56,10 @@ export class App {
 
     this.app.get(
       '/docs',
-      Scalar({
+      apiReference({
         pageTitle: 'JioSaavn API Documentation',
-        theme: 'purple',
+        theme: 'deepSpace',
         isEditable: false,
-        defaultOpenAllTags: true,
-        expandAllResponses: true,
         layout: 'modern',
         darkMode: true,
         metaData: {
@@ -86,21 +78,18 @@ export class App {
 
   private initializeRouteFallback() {
     this.app.notFound((ctx) => {
-      return ctx.json({ error: { code: 'NOT_FOUND', message: 'Route not found, see /docs' } }, 404)
+      return ctx.json({ success: false, message: 'route not found, check docs at https://saavn.dev/docs' }, 404)
     })
   }
 
   private initializeErrorHandler() {
     this.app.onError((err, ctx) => {
       const error = err as HTTPException
-      const status = error.status || 500
-      const code = ERROR_CODE_MAP[status] || 'ERROR'
-
-      return ctx.json({ error: { code, message: error.message } }, status)
+      return ctx.json({ success: false, message: error.message }, error.status || 500)
     })
   }
 
   public getApp() {
     return this.app
   }
-                      }
+}

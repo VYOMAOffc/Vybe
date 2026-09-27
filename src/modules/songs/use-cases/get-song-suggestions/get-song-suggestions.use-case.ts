@@ -40,11 +40,14 @@ export class GetSongSuggestionsUseCase implements IUseCase<GetSongSuggestionsArg
 
     return Object.values(suggestions)
   .map((element) => {
-    if (!element || !element.song || !element.song.id) {
+    const item = element as any
+    const song = item?.song ?? item
+
+    if (!song || !song.id) {
       return null
     }
 
-    return createSongPayload(element.song)
+    return createSongPayload(song)
   })
   .filter(Boolean)
   .slice(0, limit)

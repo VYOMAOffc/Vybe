@@ -11,7 +11,8 @@ export const Endpoints = {
     link: 'webapi.get',
     suggestions: 'reco.getreco',
     lyrics: 'lyrics.getLyrics',
-    station: 'webradio.createEntityStation'
+    station: 'webradio.createEntityStation',
+    getStation: 'webradio.getSongStation',
   },
   albums: {
     id: 'content.getAlbumDetails',

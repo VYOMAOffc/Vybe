@@ -230,7 +230,8 @@ export class SongController implements Routes {
 ),
 
     
-    this.controller.openapi(
+    
+      this.controller.openapi(
   createRoute({
     method: 'get',
     path: '/songs/radio/{songId}',
@@ -257,34 +258,36 @@ export class SongController implements Routes {
       }
     }
   }),
-  async (c) => {
-    const songId = c.req.param('songId');
+  async (ctx) => {
+    const songId = ctx.req.param('songId');
     try {
-      const songRes = await fetch(`https://vybe.vyoma-apps.workers.dev/api/songs?id=${songId}`);
-      const songData = await songRes.json();
-      const song = songData.data?.[0];
+      // 1. Song ka detail directly service se le
+      const songs = await this.songService.getSongByIds({ songIds: songId });
+      const song: any = Array.isArray(songs) ? songs[0] : songs;
       if (!song) throw new Error('Song not found');
 
       const artist = song.artists?.primary?.[0]?.name || '';
       const album = song.album?.name || '';
       const language = song.language || 'hindi';
 
+      // 2. Search service se similar songs nikal
+      // (Yahan SearchService import karna padega)
       const queries = [artist, album, language].filter(Boolean);
-      const results = await Promise.all(
-        queries.map(q => 
-          fetch(`https://vybe.vyoma-apps.workers.dev/api/search/songs?query=${encodeURIComponent(q)}&limit=20`)
-            .then(r => r.json())
-        )
-      );
+      const allSongs: any[] = [];
+      
+      for (const q of queries) {
+        const results = await this.songService.searchSongs?.(q) ?? [];
+        allSongs.push(...results);
+      }
 
-      const allSongs = results.flatMap(r => r.data?.results || []);
-      const unique = Array.from(new Map(allSongs.map(s => [s.id, s])).values());
-      const filtered = unique.filter(s => s.id !== songId);
+      // 3. Dedupe + shuffle
+      const unique = Array.from(new Map(allSongs.map((s: any) => [s.id, s])).values());
+      const filtered = unique.filter((s: any) => s.id !== songId);
       const shuffled = filtered.sort(() => Math.random() - 0.5);
 
-      return c.json({ success: true, data: shuffled }, 200);
+      return ctx.json({ success: true, data: shuffled }, 200);
     } catch (error: any) {
-      return c.json({ success: false, error: error.message }, 500);
+      return ctx.json({ success: false, error: error.message }, 500);
     }
   }
 ),

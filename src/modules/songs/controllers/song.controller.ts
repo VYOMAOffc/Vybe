@@ -5,6 +5,7 @@ import { z } from 'zod'
 import type { Routes } from '#common/types'
 import type { hc } from 'hono/client'
 import { Controller } from '#common/controller';
+import { Song } from '@saavn-labs/sdk';
 
 export class SongController implements Routes {
   public controller: OpenAPIHono
@@ -189,6 +190,44 @@ export class SongController implements Routes {
         return ctx.json({ success: true, data: suggestions })
       }
     )
+
+    this.controller.openapi(
+  createRoute({
+    method: 'get',
+    path: '/songs/recommendations/{songId}',
+    tags: ['Songs'],
+    summary: 'Get song recommendations',
+    request: {
+      params: z.object({
+        songId: z.string().openapi({
+          param: { name: 'songId', in: 'path' }
+        })
+      })
+    },
+    responses: {
+      200: {
+        description: 'Recommended songs',
+        content: {
+          'application/json': {
+            schema: z.object({
+              success: z.boolean(),
+              data: z.array(z.any())
+            })
+          }
+        }
+      }
+    }
+  }),
+  async (c) => {
+    const songId = c.req.param('songId');
+    try {
+      const recos = await Song.getRecommendations({ songId });
+      return c.json({ success: true, data: recos }, 200);
+    } catch (error: any) {
+      return c.json({ success: false, error: error.message }, 500);
+    }
+  }
+),
 
     this.controller.openapi(
   createRoute({

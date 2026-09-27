@@ -24,7 +24,7 @@ export class GetSongSuggestionsUseCase
         pid: songId,
         limit: safeLimit
       },
-      context: ApiContextEnum.ANDROID
+      context: Undefined 
     })
 
     if (!data || !ok) {

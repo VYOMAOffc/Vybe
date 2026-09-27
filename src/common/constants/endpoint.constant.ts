@@ -9,7 +9,7 @@ export const Endpoints = {
   songs: {
     id: 'song.getDetails',
     link: 'webapi.get',
-    suggestions: 'webradio.getSong',
+    suggestions: 'reco.getreco',
     lyrics: 'lyrics.getLyrics',
     station: 'webradio.createEntityStation'
   },

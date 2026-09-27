@@ -229,48 +229,7 @@ export class SongController implements Routes {
   }
 ),
 
-    this.controller.openapi(
-  createRoute({
-    method: 'get',
-    path: '/songs/{id}/radio',
-    tags: ['Songs'],
-    summary: 'Create song radio station',
-    operationId: 'createSongRadio',
-    request: {
-      params: z.object({
-        id: z.string().openapi({
-          title: 'Song ID',
-          description: 'Song ID to create a radio station from',
-          type: 'string',
-          example: 'aRZbUYD7'
-        })
-      })
-    },
-    responses: {
-      200: {
-        description: 'Successful response with radio songs',
-        content: {
-          'application/json': {
-            schema: z.object({
-              success: z.boolean(),
-              data: z.any()
-            })
-          }
-        }
-      }
-    }
-  }),
-  async (ctx) => {
-    const songId = ctx.req.param('id')
-
-    const response = await this.songService.createSongStation(songId)
-
-    return ctx.json({
-      success: true,
-      data: response
-    })
-  }
-)
+    
     this.controller.openapi(
   createRoute({
     method: 'get',

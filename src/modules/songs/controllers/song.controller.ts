@@ -274,6 +274,65 @@ export class SongController implements Routes {
     this.controller.openapi(
   createRoute({
     method: 'get',
+    path: '/songs/radio/{songId}',
+    tags: ['Songs'],
+    summary: 'Get radio-like queue based on a song',
+    request: {
+      params: z.object({
+        songId: z.string().openapi({
+          param: { name: 'songId', in: 'path' }
+        })
+      })
+    },
+    responses: {
+      200: {
+        description: 'Radio queue',
+        content: {
+          'application/json': {
+            schema: z.object({
+              success: z.boolean(),
+              data: z.array(z.any())
+            })
+          }
+        }
+      }
+    }
+  }),
+  async (c) => {
+    const songId = c.req.param('songId');
+    try {
+      const songRes = await fetch(`https://vybe.vyoma-apps.workers.dev/api/songs?id=${songId}`);
+      const songData = await songRes.json();
+      const song = songData.data?.[0];
+      if (!song) throw new Error('Song not found');
+
+      const artist = song.artists?.primary?.[0]?.name || '';
+      const album = song.album?.name || '';
+      const language = song.language || 'hindi';
+
+      const queries = [artist, album, language].filter(Boolean);
+      const results = await Promise.all(
+        queries.map(q => 
+          fetch(`https://vybe.vyoma-apps.workers.dev/api/search/songs?query=${encodeURIComponent(q)}&limit=20`)
+            .then(r => r.json())
+        )
+      );
+
+      const allSongs = results.flatMap(r => r.data?.results || []);
+      const unique = Array.from(new Map(allSongs.map(s => [s.id, s])).values());
+      const filtered = unique.filter(s => s.id !== songId);
+      const shuffled = filtered.sort(() => Math.random() - 0.5);
+
+      return c.json({ success: true, data: shuffled }, 200);
+    } catch (error: any) {
+      return c.json({ success: false, error: error.message }, 500);
+    }
+  }
+),
+      
+    this.controller.openapi(
+  createRoute({
+    method: 'get',
     path: '/songs/{id}/lyrics',
     tags: ['Songs'],
     summary: 'Retrieve song lyrics',

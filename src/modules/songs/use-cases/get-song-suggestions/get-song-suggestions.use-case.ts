@@ -27,8 +27,11 @@ export class GetSongSuggestionsUseCase
 
     console.log('RADIO SONG ID:', songId)
     console.log('RADIO STATION ID:', stationId)
-    console.log('RADIO SONG ID:', songId)
-    console.log('RADIO STATION ID:', stationId)
+    console.log('RADIO LIMIT:', limit)
+console.log('RADIO PARAMS:', JSON.stringify({
+  stationid: stationId,
+  k: limit
+}))
 
     const { data, ok } =
       await useFetch<z.infer<typeof SongSuggestionAPIResponseModel>>({

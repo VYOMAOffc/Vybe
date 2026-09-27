@@ -75,5 +75,6 @@
     "typescript": "^5.8.2",
     "vitest": "^3.0.9",
     "wrangler": "^4.6.0"
+    "@saavn-labs/sdk": "^0.1.5"
   }
 }

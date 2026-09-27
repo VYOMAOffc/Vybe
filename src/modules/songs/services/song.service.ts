@@ -13,12 +13,14 @@ export class SongService {
   private readonly getSongByLinkUseCase: GetSongByLinkUseCase
   private readonly createSongStationUseCase: CreateSongStationUseCase
   private readonly getSongSuggestionsUseCase: GetSongSuggestionsUseCase
+  private readonly getSongLyricsUseCase: GetSongLyricsUseCase
 
   constructor() {
     this.getSongByIdUseCase = new GetSongByIdUseCase()
     this.getSongByLinkUseCase = new GetSongByLinkUseCase()
     this.createSongStationUseCase = new CreateSongStationUseCase()
     this.getSongSuggestionsUseCase = new GetSongSuggestionsUseCase()
+    this.getSongLyricsUseCase = new GetSongLyricsUseCase()
   }
 
   getSongByIds = (args: GetSongByIdArgs) => {
@@ -35,5 +37,9 @@ export class SongService {
 
   getSongSuggestions = (args: GetSongSuggestionsArgs) => {
     return this.getSongSuggestionsUseCase.execute(args)
+
+  getSongLyrics = (songId: string) => {
+  return this.getSongLyricsUseCase.execute(songId)
+    }
   }
 }

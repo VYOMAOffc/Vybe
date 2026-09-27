@@ -37,10 +37,11 @@ export class SongService {
 
   getSongSuggestions = (args: GetSongSuggestionsArgs) => {
     return this.getSongSuggestionsUseCase.execute(args)
+  }
 
   getSongLyrics = (songId: string) => {
   return this.getSongLyricsUseCase.execute(songId)
   }
-  }
+  
   
 }

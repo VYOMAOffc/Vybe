@@ -33,10 +33,15 @@ export class GetSongSuggestionsUseCase implements IUseCase<GetSongSuggestionsArg
     })
 
     if (!data || !ok) {
-      throw new HTTPException(404, { message: `no suggestions found for the given song` })
-    }
+  throw new HTTPException(404, {
+    message: `no suggestions found for the given song`
+  })
+}
 
-    const { stationid, ...suggestions } = data
+console.log('STATION ID:', stationId)
+console.log('RAW RADIO DATA:', JSON.stringify(data))
+
+const { stationid, ...suggestions } = data
 
     return Object.values(suggestions)
   .map((element) => {

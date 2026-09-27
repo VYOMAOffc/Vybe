@@ -3,6 +3,7 @@ import {
   GetSongByIdUseCase,
   GetSongByLinkUseCase,
   GetSongSuggestionsUseCase,
+  GetSongLyricsUseCase,
   type GetSongByIdArgs,
   type GetSongSuggestionsArgs
 } from '#modules/songs/use-cases'

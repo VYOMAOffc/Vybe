@@ -6,6 +6,7 @@ import type { Routes } from '#common/types'
 import type { hc } from 'hono/client'
 import { Controller } from '#common/controller';
 import { Song } from '@saavn-labs/sdk';
+import { SearchService } from '#modules/search/services';
 
 export class SongController implements Routes {
   public controller: OpenAPIHono

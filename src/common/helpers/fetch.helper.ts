@@ -32,14 +32,10 @@ export const useFetch = async <T>({ endpoint, params, context }: FetchParams): P
     headers: { 'Content-Type': 'application/json', 'User-Agent': randomUserAgent }
   })
 
-  const data = await response.json()
-  return {
-  data: {
-    ...(data as any),
-    __debug_url: url.toString()
-  } as T,
-  ok: response.ok
-  }
+    const data = await response.json()
 
-  return { data: data as T, ok: response.ok }
+  return {
+    data: data as T,
+    ok: response.ok
+  }
 }

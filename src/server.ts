@@ -8,8 +8,7 @@ const app = new App([
   new SongController(),
   new AlbumController(),
   new ArtistController(),
-  new PlaylistController(),
-  new RadioController()
+  new PlaylistController()
 ]).getApp()
 
 export default app

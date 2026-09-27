@@ -4,6 +4,7 @@ import { SongService } from '#modules/songs/services'
 import { z } from 'zod'
 import type { Routes } from '#common/types'
 import type { hc } from 'hono/client'
+import { Controller } from '#common/controller';
 
 export class SongController implements Routes {
   public controller: OpenAPIHono

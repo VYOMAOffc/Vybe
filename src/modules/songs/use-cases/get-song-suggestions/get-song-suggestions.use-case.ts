@@ -40,6 +40,7 @@ export class GetSongSuggestionsUseCase
 
     console.log('RADIO OK:', ok)
     console.log('RADIO RAW DATA:', JSON.stringify(data))
+    return data as any
 
     if (!data || !ok) {
       throw new HTTPException(404, {

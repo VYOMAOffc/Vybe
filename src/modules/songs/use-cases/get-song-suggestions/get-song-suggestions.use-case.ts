@@ -34,17 +34,19 @@ export class GetSongSuggestionsUseCase
     }
 
     const items = Array.isArray(data)
-      ? data
-      : Object.values(data)
+  ? data
+  : Array.isArray(data?.songs)
+    ? data.songs
+    : Object.values(data)
 
-    const songs = items
-      .filter((item: any) => item && typeof item === 'object')
-      .map((item: any) => item.song ?? item)
-      .filter((song: any) => song?.id)
-      .filter((song: any) => String(song.id) !== String(songId))
-      .map((song: any) => createSongPayload(song))
-      .filter(Boolean)
-      .slice(0, safeLimit)
+const songs = items
+  .filter((item: any) => item && typeof item === 'object')
+  .map((item: any) => item.song ?? item)
+  .filter((song: any) => song?.id)
+  .filter((song: any) => String(song.id) !== String(songId))
+  .map((song: any) => createSongPayload(song))
+  .filter(Boolean)
+  .slice(0, safeLimit)
 
     return songs
   }

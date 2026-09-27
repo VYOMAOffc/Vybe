@@ -16,11 +16,13 @@ export class GetSongSuggestionsUseCase
   implements IUseCase<GetSongSuggestionsArgs, z.infer<typeof SongModel>[]> {
 
   async execute({ songId, limit }: GetSongSuggestionsArgs) {
+    const safeLimit = Math.min(Math.max(limit || 10, 1), 50)
+
     const { data, ok } = await useFetch<any>({
       endpoint: Endpoints.songs.suggestions,
       params: {
         pid: songId,
-        limit
+        limit: safeLimit
       },
       context: ApiContextEnum.ANDROID
     })
@@ -31,14 +33,18 @@ export class GetSongSuggestionsUseCase
       })
     }
 
-    const songs = Object.values(data)
+    const items = Array.isArray(data)
+      ? data
+      : Object.values(data)
+
+    const songs = items
       .filter((item: any) => item && typeof item === 'object')
       .map((item: any) => item.song ?? item)
       .filter((song: any) => song?.id)
+      .filter((song: any) => String(song.id) !== String(songId))
       .map((song: any) => createSongPayload(song))
       .filter(Boolean)
-      .filter((song: any) => song.id !== songId)
-      .slice(0, limit)
+      .slice(0, safeLimit)
 
     return songs
   }

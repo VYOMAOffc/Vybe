@@ -41,5 +41,5 @@ export class SongService {
   getSongLyrics = (songId: string) => {
   return this.getSongLyricsUseCase.execute(songId)
     }
-  }
+  
 }

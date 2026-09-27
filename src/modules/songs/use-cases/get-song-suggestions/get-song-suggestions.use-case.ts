@@ -42,9 +42,10 @@ console.log('RADIO PARAMS:', JSON.stringify({
         },
         context: ApiContextEnum.ANDROID
       })
-
+    
     console.log('RADIO OK:', ok)
     console.log('RADIO RAW DATA:', JSON.stringify(data))
+    return data as any
     
 
     if (!data || !ok) {

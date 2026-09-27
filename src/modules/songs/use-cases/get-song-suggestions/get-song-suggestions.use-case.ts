@@ -35,7 +35,7 @@ export class GetSongSuggestionsUseCase
           stationid: stationId,
           k: limit
         },
-        context: ApiContextEnum.WEB6DOT0
+        context: ApiContextEnum.ANDROID
       })
 
     console.log('RADIO OK:', ok)

@@ -188,5 +188,46 @@ export class SongController implements Routes {
         return ctx.json({ success: true, data: suggestions })
       }
     )
+    this.controller.openapi(
+  createRoute({
+    method: 'get',
+    path: '/songs/{id}/lyrics',
+    tags: ['Songs'],
+    summary: 'Retrieve song lyrics',
+    operationId: 'getSongLyrics',
+    request: {
+      params: z.object({
+        id: z.string().openapi({
+          description: 'ID of the song',
+          type: 'string',
+          example: 'aRZbUYD7'
+        })
+      })
+    },
+    responses: {
+      200: {
+        description: 'Successful response with song lyrics',
+        content: {
+          'application/json': {
+            schema: z.object({
+              success: z.boolean(),
+              data: z.any()
+            })
+          }
+        }
+      }
+    }
+  }),
+  async (ctx) => {
+    const songId = ctx.req.param('id')
+
+    const response = await this.songService.getSongLyrics(songId)
+
+    return ctx.json({
+      success: true,
+      data: response
+    })
+  }
+)
   }
 }

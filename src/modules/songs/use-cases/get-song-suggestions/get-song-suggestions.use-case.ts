@@ -48,3 +48,6 @@ export class GetSongSuggestionsUseCase implements IUseCase<GetSongSuggestionsArg
   })
   .filter(Boolean)
   .slice(0, limit)
+
+  }
+}

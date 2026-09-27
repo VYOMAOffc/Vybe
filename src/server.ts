@@ -8,7 +8,7 @@ const app = new App([
   new SongController(),
   new AlbumController(),
   new ArtistController(),
-  new PlaylistController()
+  new PlaylistController(),
   new RadioController()
 ]).getApp()
 

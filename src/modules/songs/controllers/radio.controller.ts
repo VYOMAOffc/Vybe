@@ -1,72 +1,32 @@
-import { createRoute, OpenAPIHono, z } from '@hono/zod-openapi'
-import type { Routes } from '#common/types'
-import { GetSongStationUseCase } from '../use-cases/get-song-station/get-song-station.use-case'
+import { Song } from '@saavn-labs/sdk';
+import { Controller } from '../../../app/controller'; // path apne project ke hisaab se adjust kar
 
-export class RadioController implements Routes {
-  public controller: OpenAPIHono
-  private getSongStationUseCase: GetSongStationUseCase
-
+export class RadioController extends Controller {
   constructor() {
-    this.controller = new OpenAPIHono()
-    this.getSongStationUseCase = new GetSongStationUseCase()
+    super('radio');
   }
 
-  public initRoutes() {
-    this.controller.openapi(
-      createRoute({
-        method: 'get',
-        path: '/songs/radio/{stationId}',
-        tags: ['Songs'],
-        summary: 'Retrieve songs from a radio station',
-        operationId: 'getRadioSongs',
-        request: {
-          params: z.object({
-            stationId: z.string().openapi({
-              title: 'Radio Station ID',
-              description: 'Radio station ID returned by the song radio endpoint',
-              type: 'string'
-            })
-          }),
-          query: z.object({
-            limit: z.string().pipe(z.coerce.number()).optional().openapi({
-              title: 'Limit',
-              description: 'Maximum number of songs to return',
-              type: 'integer',
-              example: '20',
-              default: '20'
-            })
-          })
-        },
-        responses: {
-          200: {
-            description: 'Successful response with radio songs',
-            content: {
-              'application/json': {
-                schema: z.object({
-                  success: z.boolean(),
-                  data: z.array(z.any())
-                })
-              }
-            }
-          },
-          404: {
-            description: 'Radio station songs not found'
-          }
-        }
-      }),
-      async (ctx) => {
-        const { stationId } = ctx.req.valid('param')
-        const { limit } = ctx.req.valid('query')
+  async getByStationId(c: any) {
+    const stationId = c.req.param('stationId');
+    const limit = Number(c.req.query('limit')) || 20;
+    const next = c.req.query('next') === 'true';
 
-        const songs = await this.getSongStationUseCase.execute(stationId)
+    try {
+      const songs = await Song.getByStationId({ stationId, limit, next });
+      return c.json({ success: true, data: songs });
+    } catch (error: any) {
+      return c.json({ success: false, error: error.message }, 500);
+    }
+  }
 
-        const limitedSongs = songs.slice(0, limit || 20)
-
-        return ctx.json({
-          success: true,
-          data: limitedSongs
-        })
-      }
-    )
+  // 🆕 
+  async getRecommendations(c: any) {
+    const songId = c.req.param('songId');
+    try {
+      const recos = await Song.getRecommendations({ songId });
+      return c.json({ success: true, data: recos });
+    } catch (error: any) {
+      return c.json({ success: false, error: error.message }, 500);
+    }
   }
 }

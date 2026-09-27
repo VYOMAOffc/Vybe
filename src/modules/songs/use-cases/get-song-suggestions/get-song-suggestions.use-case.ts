@@ -13,7 +13,9 @@ export interface GetSongSuggestionsArgs {
   limit: number
 }
 
-export class GetSongSuggestionsUseCase implements IUseCase<GetSongSuggestionsArgs, z.infer<typeof SongModel>[]> {
+export class GetSongSuggestionsUseCase
+  implements IUseCase<GetSongSuggestionsArgs, z.infer<typeof SongModel>[]> {
+
   private readonly createSongStation: CreateSongStationUseCase
 
   constructor() {
@@ -23,39 +25,38 @@ export class GetSongSuggestionsUseCase implements IUseCase<GetSongSuggestionsArg
   async execute({ songId, limit }: GetSongSuggestionsArgs) {
     const stationId = await this.createSongStation.execute(songId)
 
-    const { data, ok } = await useFetch<z.infer<typeof SongSuggestionAPIResponseModel>>({
-      endpoint: Endpoints.songs.suggestions,
-      params: {
-        stationid: stationId,
-        k: limit
-      },
-      context: ApiContextEnum.ANDROID
-    })
+    console.log('RADIO SONG ID:', songId)
+    console.log('RADIO STATION ID:', stationId)
+
+    const { data, ok } =
+      await useFetch<z.infer<typeof SongSuggestionAPIResponseModel>>({
+        endpoint: Endpoints.songs.suggestions,
+        params: {
+          stationid: stationId,
+          k: limit
+        },
+        context: ApiContextEnum.ANDROID
+      })
+
+    console.log('RADIO OK:', ok)
+    console.log('RADIO RAW DATA:', JSON.stringify(data))
 
     if (!data || !ok) {
-  throw new HTTPException(404, {
-    message: `no suggestions found for the given song`
-  })
-}
-
-console.log('STATION ID:', stationId)
-console.log('RAW RADIO DATA:', JSON.stringify(data))
-
-const { stationid, ...suggestions } = data
-
-    return Object.values(suggestions)
-  .map((element) => {
-    const item = element as any
-    const song = item?.song ?? item
-
-    if (!song || !song.id) {
-      return null
+      throw new HTTPException(404, {
+        message: 'no radio suggestions found'
+      })
     }
 
-    return createSongPayload(song)
-  })
-  .filter(Boolean)
-  .slice(0, limit)
+    const songs = Object.values(data)
+      .filter((item: any) => item && typeof item === 'object')
+      .map((item: any) => item.song ?? item)
+      .filter((song: any) => song && song.id)
+      .map((song: any) => createSongPayload(song))
+      .filter(Boolean)
+      .slice(0, limit)
 
+    console.log('RADIO SONG COUNT:', songs.length)
+
+    return songs
   }
-}
+  }
